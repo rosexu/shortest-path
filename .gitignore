@@ -2,5 +2,6 @@
 /dist
 /.tmp
 /.sass-cache
+/static/bower_components
 /bower_components
 .idea/*
