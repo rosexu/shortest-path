@@ -31,6 +31,8 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
         return;
       }
 
+      console.log(place);
+
       $scope.places.push(place);
       $scope.$apply();
 

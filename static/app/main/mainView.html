@@ -3,8 +3,15 @@
 
 <div class="container">
     <div class="card well container-fluid" ng-repeat="place in places track by $index">
-        <div class="location-name">{{ place.name }}</div>
-        <button class="btn btn-flat btn-warning" ng-click="removePlace($index)">Delete</button>
+        <div class="left">
+            <div class="location-name">
+                <h4>{{ place.name }}</h4>
+            </div>
+            <div class="address">{{ place.formatted_address }}</div>
+        </div>
+        <div class="right"></div>
+<!--        <button class="btn btn-flat btn-warning" ng-click="removePlace($index)">Delete</button> -->
+        <img id="close-icon" src="static/images/cross.svg" ng-click="removePlace($index)" alt="close-icon">
     </div>
 </div>
 
