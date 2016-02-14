@@ -8,23 +8,24 @@ angular.module('myApp.results', []).controller('ResultsController', ['Itinerary'
 		}
 
 		$scope.places = Itinerary.searchedPlaces;
-		sortPlaces();
 		$scope.tripLegs = Itinerary.tripLegs;
+		sortPlaces();
 		sanitizeTime();
 
 		function sortPlaces() {
-			if(!$scope.tripLegs) return;
+			var map = new Object();
+			for (var i = 0; i < $scope.places.length; i++){
+				var pl = $scope.places[i];
+				map[pl.formatted_address] = pl;
+			}
+
 			var sortedPlaces = [];
-			var firstPlace = places.filter(function(pl) {
-				return pl.formatted_address === tripLegs[0].start_loc;
-			});
-			sortedPlaces.push(firstPlace);
-			tripLegs.forEach(function(leg) {
-				var place = places.filter(function(pl) {
-					return pl.formatted_address === leg.end_loc;
-				});
-				sortedPlaces.push(place);
-			});
+			sortedPlaces.push(map[$scope.tripLegs[0].start_loc]);
+			for (var j = 0; j < $scope.tripLegs.length; j++) {
+				var place =  $scope.tripLegs[j].end_loc;
+				sortedPlaces.push(map[place]);
+			}
+
 			$scope.places = sortedPlaces;
 		}
 
