@@ -40,7 +40,7 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
       autocomplete.bindTo('bounds', map);
 
       var infowindow = new google.maps.InfoWindow();
-
+      setMapOnAll(null);
       autocomplete.addListener('place_changed', function() {
         infowindow.close();
 
@@ -106,6 +106,13 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
       map.fitBounds(bounds);
     }
+
+    function setMapOnAll(map) {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+      }
+    }
+
     $scope.removePlace = function (idx) {
       markers[idx].setMap(null);
       markers[idx] = null;
@@ -123,6 +130,7 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
       Itinerary.markers = markers;
 
       Itinerary.getItinerary(timePicker.val(), $scope.places, $scope.selectMode).then(function (data) {
+        setMapOnAll(null);
         $location.path('/results');
       }, function (err) {
         console.error('Failed to get itinerary', err);

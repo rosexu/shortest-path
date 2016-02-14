@@ -1,1 +1,43 @@
-<p>This is the partial for view 2.</p>
+<img id="logo" src="static/images/logo.png" style="width: 120px; display: inline-block">
+<div style="font-family: Roboto; display: inline-block; color: #407488; font-weight: 700; font-size: 18px; vertical-align: middle">
+    The Traveling Tourist
+</div>
+
+<div class="container">
+    <!-- first location -->
+    <div class="leg-part" ng-show="tripLegs.length">
+        <div class="card well container-fluid">
+            <div class="left">
+                <img class="building-icon" src="{{ places[0].icon }}" alt="icon">
+            </div>
+            <div class="right">
+                <div class="location-name">
+                    <h4>{{ places[0].name }}</h4>
+                </div>
+                <div class="address">{{ places[0].formatted_address }}</div>
+                <div class="duration">Duration: {{ places[0].duration }} minutes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="leg-part" ng-show="tripLegs.length" ng-repeat="leg in tripLegs track by $index">
+        <div class="card well container-fluid leg">
+            <p>Starting Location: {{ leg.start_loc }}</p>
+            <p>Start time: {{ leg.start_time.hour }}:{{ leg.start_time.minute }}</p>
+            <p>Ending Location: {{ leg.end_loc }}</p>
+            <p>Travel Duration Formatted: {{ leg.travel_duration.hour }} hours {{ leg.travel_duration.min }} minutes </p>
+        </div>
+        <div class="card well container-fluid">
+            <div class="left">
+                <img class="building-icon" src="{{ places[$index + 1].icon }}" alt="icon">
+            </div>
+            <div class="right">
+                <div class="location-name">
+                    <h4>{{ places[$index + 1].name }}</h4>
+                </div>
+                <div class="address">{{ places[$index + 1].formatted_address }}</div>
+                <div class="duration">Duration: {{ places[$index + 1].duration }} minutes</div>
+            </div>
+        </div>
+    </div>
+</div>
