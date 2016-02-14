@@ -1,8 +1,8 @@
 <input id="pac-input" class="controls" type="text"
         placeholder="Enter a location">
 
-<div class="container">
-    <div class="card well container-fluid" ng-repeat="place in places track by $index">
+<div id="nav2" class="container">
+    <div class="card well container-fluid" ng-show="places.length" ng-repeat="place in places track by $index">
         <div class="left">
             <img class="building-icon" src="{{ place.icon }}" alt="icon">
         </div>
@@ -14,6 +14,9 @@
         </div>
 <!--        <button class="btn btn-flat btn-warning" ng-click="removePlace($index)">Delete</button> -->
         <img id="close-icon" src="static/images/cross.svg" ng-click="removePlace($index)" alt="close-icon">
+    </div>
+    <div ng-hide="places.length" style="text-align: center; color: #b3b3b3; margin-top: 20px">
+        Start your adventure by adding places to visit!
     </div>
 </div>
 
