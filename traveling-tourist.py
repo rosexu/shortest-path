@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import render_template
 import requests
+import json
+import sys
 
 app = Flask(__name__)
 
@@ -36,13 +38,28 @@ class TravelingTourist:
         weights = []
         for i in range(0, len(self.locations) - 1):
             for j in range(i+1, len(self.locations)):
-                weights.append(self.calculate_weight(self.locations[i], self.locations[j]))
-
+                weights.append(str(self.calculate_weight(self.locations[i], self.locations[j])))
         return weights
 
-    def calculate_weight(self, loc_a, loc_b):
-        # TODO: add Google map api call here with the query params
-        return loc_a+loc_b
+    # Returns: the list of int weights as a comma-delimited string.
+    def weights_as_string(self, weights):
+        return ",".join(weights)
+
+    def calculate_weight(self, location_a, location_b):
+        baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?&key=AIzaSyD1VgpTw216ScP1Vo23YrWQEKoL1pSUvys"
+        params = {'origins': location_a, 'destinations': location_b, 'mode': self.mode, 
+            'avoid': self.avoid, 'transit_preferences': self.transit_preferences }
+        if self.mode == "transit":
+            params['transit_mode'] = self.transit_mode
+        data = json.loads(requests.get(baseUrl, params).text)
+        if data['status'] == "OK":
+            element = data['rows'][0]['elements'][0]
+            if element['status'] == "OK":
+                return element['duration']['value']
+            else:
+                return sys.maxint
+        else:
+            raise Exception("API call failure.")
 
     # Return a json object with the first field being the minimum time required to hit
     # all the places and the second field being the sequence that yields the shortest time.
@@ -68,12 +85,11 @@ def main_page():
 
 @app.route('/example')
 def example_page():
-    locations = ["1", "2", "3", "4", "5"]
-    tourist = TravelingTourist("walking", "", "", "", locations)
+    locations = ["San Francisco", "Stanford", "Palo Alto", "Redwood City", "San Mateo"]
+    tourist = TravelingTourist("walking", "", "less_walking", "", locations)
     weights = tourist.get_weights()
-    weights_string = ",".join(weights)
-    tourist.request_shortest_path(5, weights_string)
-    return render_template('example.html', name=weights_string)
+    result = tourist.request_shortest_path(5, tourist.weights_as_string(weights))
+    return render_template('example.html', name=result)
 
 if __name__ == '__main__':
     app.run(debug=True)
