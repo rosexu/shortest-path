@@ -1,6 +1,14 @@
 <input id="pac-input" class="controls" type="text"
         placeholder="Enter a location">
 
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selectMode}}
+  <span class="caret"></span></button>
+  <ul class="dropdown-menu">
+    <li ng-repeat="option in travelOptions" ng-click="updateMode(option.name)"><a href="">{{option.prettyName}}</a></li>
+  </ul>
+</div>
+
 <div id="nav2" class="container">
     <div class="card well container-fluid" ng-show="places.length" ng-repeat="place in places track by $index">
         <div class="left">
