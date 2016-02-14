@@ -1,0 +1,9 @@
+<input id="pac-input" class="controls" type="text"
+        placeholder="Enter a location">
+
+<div ng-repeat="place in places track by $index">
+	{{ place.name }}
+	<button ng-click="removePlace($index)">delete</button>
+</div>
+
+<button ng-show="places.length" ng-click="submit">LEGGO</button>
