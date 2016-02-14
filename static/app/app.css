@@ -98,6 +98,26 @@ html, body {
   padding-right: 7px;
 }
 
+.left{
+  width: calc(30% - 19*0.3px);
+  display: inline-block;
+}
+
+h4 {
+  font-weight: bold;
+}
+
+.right{
+  width: calc(70% - 19*0.7px);
+  display: inline-block;
+}
+
+.building-icon {
+  max-width: 50px;
+  margin-bottom: 25px;
+  margin-left: 20px;
+}
+
 .card.well.container-fluid {
   -webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
@@ -124,4 +144,17 @@ html, body {
     z-index: 69;
     position: relative;
     height: 100vh;
+}
+
+#bottom-bar {
+  width: 100%;
+}
+
+button.submit {
+  position: absolute;
+  left: 40px;
+}
+
+#nav{
+  overflow: scroll;
 }
