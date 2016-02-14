@@ -61,6 +61,45 @@ class TravelingTourist:
         result = requests.get(wolfram_url, params=params)
         return result.json()
 
+class Time:
+# LOL MAKING OUR OWN TIME CLASS
+    # 0 to 59
+    minute = 0
+    # 0 to 23
+    hour = 0
+    def __init__(self, hour, minute):
+        self.hour = hour
+        self.minute = minute
+
+    def to_string(self):
+        return str(self.hour) + ":" + str(self.minute)
+
+    def add(self, minutes):
+        temp_min = self.minute + minutes
+        if temp_min < 59:
+            self.minute = temp_min
+        else:
+            temp_hour = temp_min / 60
+            self.minute = temp_min % 60
+            self.hour = (self.hour + temp_hour) % 24
+
+
+class Itinerary:
+
+    # dictionary mapping location to amount of time allocated at that location.
+    loc_to_duration = {}
+
+    current_time = ""
+
+    travel_sequence = ""
+
+    def __init__(self, loc_to_duration, current_time, sequence):
+        self.loc_to_duration = loc_to_duration
+        self.current_time = current_time
+        self.travel_sequence = sequence
+
+
+
 
 @app.route('/')
 def main_page():
@@ -77,3 +116,10 @@ def example_page():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# Idea for shortest route with opening hour constraints.
+# Do a check to make sure nothing is already closed.
+# Try to get shortest route. See if closing hour activities are satisfied.
+# Sort the list based on closing hours.
+# Place all the ones that must be hit in place.
+# Try to minimize time after.
