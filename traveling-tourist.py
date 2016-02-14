@@ -78,12 +78,14 @@ class TravelingTourist:
         result = requests.get(wolfram_url, params=params)
         return result.json()
 
+
 class Time:
-# LOL MAKING OUR OWN TIME CLASS
+    # LOL MAKING OUR OWN TIME CLASS
     # 0 to 59
     minute = 0
     # 0 to 23
     hour = 0
+
     def __init__(self, hour, minute):
         self.hour = hour
         self.minute = minute
@@ -110,12 +112,38 @@ class Itinerary:
 
     travel_sequence = ""
 
-    def __init__(self, loc_to_duration, current_time, sequence):
+    # an array of time going from place to place, in order
+    travel_duration = []
+
+    result = []
+
+    class TravelLeg:
+        start_loc = ""
+        end_loc = ""
+        duration = 0
+        start_time = ""
+
+        def __init__(self, start_loc, end_loc, duration, start_time):
+            self.start_loc = start_loc
+            self.end_loc = end_loc
+            self.duration = duration
+            self.start_time = start_time
+
+        def get_end_time(self):
+            return self.start_time + self.duration
+
+    def __init__(self, loc_to_duration, current_time, sequence, time_duration):
         self.loc_to_duration = loc_to_duration
         self.current_time = current_time
         self.travel_sequence = sequence
+        self.time_duration = time_duration
 
-
+    def create_itinerary(self):
+        time = self.current_time
+        for i in range(0, self.travel_sequence.length - 1):
+            leg = self.TravelLeg(self.travel_sequence[i], self.travel_sequence[i+1], self.travel_duration, time)
+            self.result.append(leg)
+            time = leg.get_end_time()
 
 
 @app.route('/')
