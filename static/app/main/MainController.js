@@ -32,6 +32,7 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
   function initController () {
     var input = document.getElementById('pac-input');
+    var durationInput = document.getElementById('duration-input');
     var types = document.getElementById('type-selector');
 
     var autocomplete = new google.maps.places.Autocomplete(input);
@@ -46,6 +47,8 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
       if (!place.geometry) {
         return;
       }
+
+      place.duration = 60;
 
       $scope.places.push(place);
       $scope.$apply();
