@@ -80,11 +80,11 @@ class TravelingTourist:
 
         params = {'locations': comma_delim_locations, 'weights': weights}
 
-        result = requests.get(wolfram_url, params=params)
-        print result.url
-
-        result = result.json()
-
+        try:
+            result = requests.get(wolfram_url, params=params).json()
+        except ValueError:
+            print "The distance between destinations is too great, can't convert to json"
+            raise
         self.shortest_duration = result[0]
 
         return result
