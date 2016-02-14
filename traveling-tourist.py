@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+import requests
 
 app = Flask(__name__)
 
@@ -43,6 +44,23 @@ class TravellingTourist:
         # TODO: add Google map api call here with the query params
         return loc_a+loc_b
 
+    # Return a json object with the first field being the minimum time required to hit
+    # all the places and the second field being the sequence that yields the shortest time.
+    def request_shortest_path(self, num_nodes, weights):
+        wolfram_url = "https://www.wolframcloud.com/objects/6493b8d9-10db-4b57-9d98-a0f2c44cc47d"
+        comma_delim_locations = ""
+
+        for i in range(1, num_nodes + 1):
+            comma_delim_locations += str(i)
+            comma_delim_locations += ","
+
+        # Cut off the last comma.
+        comma_delim_locations = comma_delim_locations[:-1]
+
+        params = {'locations': comma_delim_locations, 'weights': weights}
+        result = requests.get(wolfram_url, params=params)
+        return result.json()
+
 
 @app.route('/')
 def main_page():
@@ -53,7 +71,8 @@ def example_page():
     locations = ["1", "2", "3", "4", "5"]
     tourist = TravellingTourist("walking", "", "", "", locations)
     weights = tourist.get_weights()
-    weights_string = " ".join(weights)
+    weights_string = ",".join(weights)
+    tourist.request_shortest_path(5, weights_string)
     return render_template('example.html', name=weights_string)
 
 if __name__ == '__main__':
