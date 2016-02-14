@@ -29,6 +29,9 @@ angular.module('myApp.services', []).service('Itinerary', ['$q', '$http', functi
     var locations = parsePlaces(places);
     var deferred = $q.defer();
 
+    that.startTime = startTime;
+    that.travelMode = mode;
+
     $http.post('/api/itinerary', {
       start_time: startTime,
       locations: locations,
@@ -51,4 +54,5 @@ angular.module('myApp.services', []).service('Itinerary', ['$q', '$http', functi
 
   this.searchedPlaces = [];
   this.tripLegs = [];
+  this.markers = [];
 }]);
