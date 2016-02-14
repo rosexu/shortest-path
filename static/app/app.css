@@ -145,3 +145,16 @@ h4 {
     position: relative;
     height: 100vh;
 }
+
+#bottom-bar {
+  width: 100%;
+}
+
+button.submit {
+  position: absolute;
+  left: 40px;
+}
+
+#nav{
+  overflow: scroll;
+}
