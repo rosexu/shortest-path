@@ -167,3 +167,29 @@ button.submit {
   margin: 0;
   display: inline-block;
 }
+
+.input-group.timepicker {
+  margin-left: 20px;
+  margin-top: 10px;
+  width: 120px;
+  display: inline-block;
+}
+
+.input-group-addon {
+  display: inline-block;
+  margin-top: 5px;
+}
+
+#timepicker1 {
+  display: inline;
+  width: 70px;
+}
+
+.pickers {
+  height: 130px;
+}
+
+.dropdown {
+  display: inline-block;
+  float: right;
+}
