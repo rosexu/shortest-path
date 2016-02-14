@@ -1,7 +1,12 @@
+<img id="logo" src="static/images/logo.png" style="width: 120px; display: inline-block">
+<div style="font-family: Roboto; display: inline-block; color: #407488; font-weight: 700; font-size: 18px; vertical-align: middle"> 
+    The Travelling Tourist
+</div>
+
 <input id="pac-input" class="controls" type="text"
         placeholder="Enter a location">
 
-<div id="nav2" class="container">
+<div class="container">
     <div class="card well container-fluid" ng-show="places.length" ng-repeat="place in places track by $index">
         <div class="left">
             <img class="building-icon" src="{{ place.icon }}" alt="icon">
@@ -14,6 +19,7 @@
         </div>
         <img id="close-icon" src="static/images/cross.svg" ng-click="removePlace($index)" alt="close-icon">
     </div>
+
     <div ng-hide="places.length" style="text-align: center; color: #b3b3b3; margin-top: 20px">
         Start your adventure by adding places to visit!
     </div>
