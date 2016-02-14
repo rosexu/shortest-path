@@ -26,7 +26,7 @@
             <div class="address">{{ place.formatted_address }}</div>
             <div class="duration">Duration:
                 <div class="form-group duration">
-                    <input class="form-control" ng-model="place.duration" id="duration-input" type="text" placeholder="{{ place.duration }}">
+                    <input class="form-control" ng-model="place.duration" id="duration-input" type="number" placeholder="{{ place.duration }}">
                 </div> minutes</div>
         </div>
         <img id="close-icon" src="static/images/cross.svg" ng-click="removePlace($index)" alt="close-icon">
