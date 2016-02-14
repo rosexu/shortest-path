@@ -1,5 +1,7 @@
 from flask import Flask
 from flask import render_template
+from flask import request
+from flask import jsonify
 import requests
 import json
 import sys
@@ -41,7 +43,6 @@ class TravelingTourist:
                 duration = self.calculate_weight(self.locations[i], self.locations[j])
                 weights.append(str(duration))
                 self.loc_to_duration[(self.locations[i], self.locations[j])] = duration
-        print self.loc_to_duration
         return weights
 
     # Returns: the list of int weights as a comma-delimited string.
@@ -100,8 +101,6 @@ class TravelingTourist:
                 travel_duration.append(self.loc_to_duration[(loc_b, loc_a)])
             else:
                 raise Exception("Unable to find duration for"+loc_a+", "+loc_b)
-        print "travel duration is"
-        print travel_duration
         return travel_duration
 
 
@@ -144,7 +143,6 @@ class Itinerary:
             self.travel_duration = travel_duration
 
         def get_end_time(self):
-            print self.start_time.to_string()
             self.start_time.add(self.travel_duration/60) 
             self.start_time.add(self.duration/60)
             return self.start_time
@@ -176,6 +174,29 @@ class Itinerary:
 def main_page():
     return render_template('index.html')
 
+@app.route('/getItinerary', methods=['POST'])
+def itinerary_page():
+    data = request.json
+    location_to_duration = data['locations']
+    locations = location_to_duration.keys()
+    mode = data['mode']
+    transit_mode = data['transit_mode']
+    transit_preferences = data['transit_preferences']
+    avoid = data['avoid']
+    start_time_raw = data['start_time'] 
+
+    start_time = Time(start_time_raw['hours'], start_time_raw['minutes'])
+    tourist = TravelingTourist(mode, transit_mode, transit_preferences, avoid, locations)
+    weights = tourist.get_weights()
+    result = tourist.request_shortest_path(len(locations), tourist.weights_as_string(weights))
+    travel_sequence = tourist.get_travel_sequence(result[1])
+    travel_duration = tourist.get_travel_duration()
+    itinerary_instance = Itinerary(location_to_duration, start_time, travel_sequence, travel_duration)
+    itinerary = itinerary_instance.create_itinerary()
+    result = {}
+    result['data'] = itinerary
+    return jsonify(**result)
+
 @app.route('/example')
 def example_page():
     location_to_duration = {"San Mateo": 1, "San Francisco": 2, "Stanford": 3, "Oakland": 1, 
@@ -185,7 +206,6 @@ def example_page():
     weights = tourist.get_weights()
     result = tourist.request_shortest_path(5, tourist.weights_as_string(weights))
     travel_sequence = tourist.get_travel_sequence(result[1])
-    print travel_sequence
 
     start_time = Time(9, 0)
     travel_duration = tourist.get_travel_duration()
