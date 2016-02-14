@@ -22,10 +22,10 @@
 
     <div class="leg-part" ng-show="tripLegs.length" ng-repeat="leg in tripLegs track by $index">
         <div class="card well container-fluid leg">
-            <p>Starting Location: {{ leg.start_loc }}</p>
-            <p>Start time: {{ leg.start_time.hour }}:{{ leg.start_time.minute }}</p>
-            <p>Ending Location: {{ leg.end_loc }}</p>
-            <p>Travel Duration Formatted: {{ leg.travel_duration.hour }} hours {{ leg.travel_duration.min }} minutes </p>
+            <p><b>Starting At:</b> {{ leg.start_loc }}</p>
+            <p><b>Start time:</b> {{ leg.start_time.hour }}:{{ leg.start_time.minute }}</p>
+            <p><b>Travel Duration: </b>{{ leg.travel_duration.hour }} hours {{ leg.travel_duration.min }} minutes </p>
+            <p><b>Arrive At: </b>{{ leg.end_loc }}</p>
         </div>
         <div class="card well container-fluid">
             <div class="left">
