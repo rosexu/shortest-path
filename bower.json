@@ -12,6 +12,7 @@
     "angular-mocks": "~1.4.0",
     "html5-boilerplate": "~5.2.0",
     "lodash": "^4.3.0",
-    "bootstrap-material-design": "~0.5.8"
+    "bootstrap-material-design": "~0.5.8",
+    "bootstrap-timepicker": "^0.5.2"
   }
 }

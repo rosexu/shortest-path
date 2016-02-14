@@ -105,13 +105,7 @@ class TravelingTourist:
 
 
 class Time:
-    # LOL MAKING OUR OWN TIME CLASS
-    # 0 to 59
-    minute = 0
-    # 0 to 23
-    hour = 0
-
-    def __init__(self, hour, minute):
+    def __init__(self, hour=0, minute=0):
         self.hour = hour
         self.minute = minute
 
@@ -174,7 +168,7 @@ class Itinerary:
 def main_page():
     return render_template('index.html')
 
-@app.route('/getItinerary', methods=['POST'])
+@app.route('/api/itinerary', methods=['POST'])
 def itinerary_page():
     data = request.json
     location_to_duration = data['locations']

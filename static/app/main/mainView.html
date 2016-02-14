@@ -5,7 +5,10 @@
 
 <input id="pac-input" class="controls" type="text"
         placeholder="Enter a location">
-
+<div class="input-group bootstrap-timepicker timepicker">
+    <input id="timepicker1" type="text" class="form-control input-small">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+</div>
 <div class="dropdown">
   <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selectMode}}
   <span class="caret"></span></button>
@@ -35,5 +38,5 @@
 </div>
 
 <div id="bottom-bar">
-    <button class="btn btn-raised btn-success submit" ng-show="places.length" ng-click="submit">Let's Go</button>
+    <button class="btn btn-raised btn-success submit" ng-show="places.length" ng-click="submit()">Let's Go</button>
 </div>

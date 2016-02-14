@@ -1,7 +1,9 @@
 'use strict';
 
-angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeout', function($scope, $timeout) {
+angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeout', '$http', function($scope, $timeout, $http) {
   var markers = [];
+  var timePicker = $('#timepicker1').timepicker();
+
   $scope.places = [];
   $scope.selectMode = 'driving';
   $scope.travelOptions = [{
@@ -101,6 +103,17 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
     map.fitBounds(bounds);
   }
 
+  function parseTime(str) {
+    var parts = str.split(' ');
+    var time = parts[0];
+    var ampm = parts[1];
+    var timeParts = time.split(':');
+
+    return {
+      hours: parseInt(timeParts[0]) + (ampm === 'PM' ? 12 : 0),
+      minutes: parseInt(timeParts[1])
+    };
+  }
 
   $scope.removePlace = function (idx) {
     markers[idx].setMap(null);
@@ -112,5 +125,24 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
   $scope.updateMode = function (option) {
     $scope.selectMode = option;
+  };
+
+  $scope.submit = function () {
+    var startTime = parseTime(timePicker.val());
+    $http.post('/api/itinerary', {
+      start_time: startTime,
+      locations: {
+        "golden gate bridge": 600,
+        "golden gate park": 200
+      },
+      mode: $scope.selectMode,
+      transit_mode: 'bus',
+      transit_preferences: 'less_walking',
+      avoid: 'tolls'
+    }).then(function(){
+      console.log('success', arguments);
+    },function(){
+      console.log('failure', arguments);
+    });
   };
 }]);
