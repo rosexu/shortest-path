@@ -118,6 +118,15 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
     };
   }
 
+  function parsePlaces(places) {
+    var dict = {};
+    places.forEach(function (place) {
+      dict[place.formatted_address] = place.duration;
+    });
+
+    return dict;
+  }
+
   $scope.removePlace = function (idx) {
     markers[idx].setMap(null);
     markers[idx] = null;
@@ -132,12 +141,11 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
   $scope.submit = function () {
     var startTime = parseTime(timePicker.val());
+    var locations = parsePlaces($scope.places);
+
     $http.post('/api/itinerary', {
       start_time: startTime,
-      locations: {
-        "golden gate bridge": 600,
-        "golden gate park": 200
-      },
+      locations: locations,
       mode: $scope.selectMode,
       transit_mode: 'bus',
       transit_preferences: 'less_walking',
