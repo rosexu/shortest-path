@@ -2,8 +2,8 @@
 
 angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeout', '$http', '$location', 'Itinerary', 
   function($scope, $timeout, $http, $location, Itinerary) {
-    var markers = [];
     var timePicker = $('#timepicker1').timepicker();
+    var markers = [];
 
     $scope.places = [];
     $scope.selectMode = 'driving';
@@ -106,7 +106,6 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
       map.fitBounds(bounds);
     }
-
     $scope.removePlace = function (idx) {
       markers[idx].setMap(null);
       markers[idx] = null;
@@ -121,6 +120,7 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
 
     $scope.submit = function () {
       Itinerary.searchedPlaces = $scope.places;
+      Itinerary.markers = markers;
 
       Itinerary.getItinerary(timePicker.val(), $scope.places, $scope.selectMode).then(function (data) {
         $location.path('/results');

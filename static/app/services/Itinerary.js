@@ -42,7 +42,7 @@ angular.module('myApp.services', []).service('Itinerary', ['$q', '$http', functi
       data.forEach(function (item) {
         that.tripLegs.push(JSON.parse(item));
       });
-      deferred.resolve(this.tripLegs);
+      deferred.resolve(that.tripLegs);
     }, function (err) {
       deferred.reject(err);
     });
