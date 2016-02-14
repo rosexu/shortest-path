@@ -1,7 +1,7 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('myApp', ['ngRoute','myApp.main', 'myApp.results'])
+angular.module('myApp', ['ngRoute','myApp.main', 'myApp.results', 'myApp.services'])
   .config(['$routeProvider',
     function($routeProvider) {
       $routeProvider

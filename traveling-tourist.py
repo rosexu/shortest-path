@@ -79,7 +79,12 @@ class TravelingTourist:
         comma_delim_locations = comma_delim_locations[:-1]
 
         params = {'locations': comma_delim_locations, 'weights': weights}
-        result = requests.get(wolfram_url, params=params).json()
+
+        result = requests.get(wolfram_url, params=params)
+        print result.url
+
+        result = result.json()
+
         self.shortest_duration = result[0]
 
         return result
