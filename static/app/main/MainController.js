@@ -3,6 +3,20 @@
 angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeout', function($scope, $timeout) {
   var markers = [];
   $scope.places = [];
+  $scope.selectMode = 'driving';
+  $scope.travelOptions = [{
+    name: 'driving',
+    prettyName: 'Driving'
+  }, {
+    name: 'walking',
+    prettyName: 'Walking'
+  }, {
+    name: 'bicycling',
+    prettyName: 'Bicycling'
+  }, {
+    name: 'transit',
+    prettyName: 'Transit'
+  }];
 
   retryInit();
 
@@ -87,11 +101,16 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
     map.fitBounds(bounds);
   }
 
+
   $scope.removePlace = function (idx) {
     markers[idx].setMap(null);
     markers[idx] = null;
     markers.splice(idx, 1);
 
     $scope.places.splice(idx, 1);
+  };
+
+  $scope.updateMode = function (option) {
+    $scope.selectMode = option;
   };
 }]);
