@@ -128,11 +128,13 @@ angular.module('myApp.main', []).controller('MainController', ['$scope', '$timeo
     $scope.submit = function () {
       Itinerary.searchedPlaces = $scope.places;
       Itinerary.markers = markers;
-
+      $scope.isLoading = true;
       Itinerary.getItinerary(timePicker.val(), $scope.places, $scope.selectMode).then(function (data) {
+        $scope.isLoading = false;
         setMapOnAll(null);
         $location.path('/results');
       }, function (err) {
+        $scope.isLoading = false;
         console.error('Failed to get itinerary', err);
       });
     };
