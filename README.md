@@ -20,6 +20,8 @@ Setting up back-end:
 
 2. Run `pip install Flask`
 
+3. Run `pip install requests`
+
 
 Running the app:
 

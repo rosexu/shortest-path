@@ -1,9 +1,12 @@
 from flask import Flask
 from flask import render_template
+import requests
+import json
+import sys
 
 app = Flask(__name__)
 
-class TravellingTourist:
+class TravelingTourist:
     'The class containing the logic for retrieving the optimal intinery.'
 
     # mode = string representing mode
@@ -35,13 +38,112 @@ class TravellingTourist:
         weights = []
         for i in range(0, len(self.locations) - 1):
             for j in range(i+1, len(self.locations)):
-                weights.append(self.calculate_weight(self.locations[i], self.locations[j]))
-
+                weights.append(str(self.calculate_weight(self.locations[i], self.locations[j])))
         return weights
 
-    def calculate_weight(self, loc_a, loc_b):
-        # TODO: add Google map api call here with the query params
-        return loc_a+loc_b
+    # Returns: the list of int weights as a comma-delimited string.
+    def weights_as_string(self, weights):
+        return ",".join(weights)
+
+    def calculate_weight(self, location_a, location_b):
+        baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json?&key=AIzaSyD1VgpTw216ScP1Vo23YrWQEKoL1pSUvys"
+        params = {'origins': location_a, 'destinations': location_b, 'mode': self.mode, 
+            'avoid': self.avoid, 'transit_preferences': self.transit_preferences }
+        if self.mode == "transit":
+            params['transit_mode'] = self.transit_mode
+        data = json.loads(requests.get(baseUrl, params).text)
+        if data['status'] == "OK":
+            element = data['rows'][0]['elements'][0]
+            if element['status'] == "OK":
+                return element['duration']['value']
+            else:
+                return sys.maxint
+        else:
+            raise Exception("API call failure.")
+
+    # Return a json object with the first field being the minimum time required to hit
+    # all the places and the second field being the sequence that yields the shortest time.
+    def request_shortest_path(self, num_nodes, weights):
+        wolfram_url = "https://www.wolframcloud.com/objects/6493b8d9-10db-4b57-9d98-a0f2c44cc47d"
+        comma_delim_locations = ""
+
+        for i in range(1, num_nodes + 1):
+            comma_delim_locations += str(i)
+            comma_delim_locations += ","
+
+        # Cut off the last comma.
+        comma_delim_locations = comma_delim_locations[:-1]
+
+        params = {'locations': comma_delim_locations, 'weights': weights}
+        result = requests.get(wolfram_url, params=params)
+        return result.json()
+
+
+class Time:
+    # LOL MAKING OUR OWN TIME CLASS
+    # 0 to 59
+    minute = 0
+    # 0 to 23
+    hour = 0
+
+    def __init__(self, hour, minute):
+        self.hour = hour
+        self.minute = minute
+
+    def to_string(self):
+        return str(self.hour) + ":" + str(self.minute)
+
+    def add(self, minutes):
+        temp_min = self.minute + minutes
+        if temp_min < 59:
+            self.minute = temp_min
+        else:
+            temp_hour = temp_min / 60
+            self.minute = temp_min % 60
+            self.hour = (self.hour + temp_hour) % 24
+
+
+class Itinerary:
+
+    # dictionary mapping location to amount of time allocated at that location.
+    loc_to_duration = {}
+
+    current_time = ""
+
+    travel_sequence = ""
+
+    # an array of time going from place to place, in order
+    travel_duration = []
+
+    result = []
+
+    class TravelLeg:
+        start_loc = ""
+        end_loc = ""
+        duration = 0
+        start_time = ""
+
+        def __init__(self, start_loc, end_loc, duration, start_time):
+            self.start_loc = start_loc
+            self.end_loc = end_loc
+            self.duration = duration
+            self.start_time = start_time
+
+        def get_end_time(self):
+            return self.start_time + self.duration
+
+    def __init__(self, loc_to_duration, current_time, sequence, time_duration):
+        self.loc_to_duration = loc_to_duration
+        self.current_time = current_time
+        self.travel_sequence = sequence
+        self.time_duration = time_duration
+
+    def create_itinerary(self):
+        time = self.current_time
+        for i in range(0, self.travel_sequence.length - 1):
+            leg = self.TravelLeg(self.travel_sequence[i], self.travel_sequence[i+1], self.travel_duration, time)
+            self.result.append(leg)
+            time = leg.get_end_time()
 
 
 @app.route('/')
@@ -50,11 +152,18 @@ def main_page():
 
 @app.route('/example')
 def example_page():
-    locations = ["1", "2", "3", "4", "5"]
-    tourist = TravellingTourist("walking", "", "", "", locations)
+    locations = ["San Francisco", "Stanford", "Palo Alto", "Redwood City", "San Mateo"]
+    tourist = TravelingTourist("walking", "", "less_walking", "", locations)
     weights = tourist.get_weights()
-    weights_string = " ".join(weights)
-    return render_template('example.html', name=weights_string)
+    result = tourist.request_shortest_path(5, tourist.weights_as_string(weights))
+    return render_template('example.html', name=result)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# Idea for shortest route with opening hour constraints.
+# Do a check to make sure nothing is already closed.
+# Try to get shortest route. See if closing hour activities are satisfied.
+# Sort the list based on closing hours.
+# Place all the ones that must be hit in place.
+# Try to minimize time after.
