@@ -40,7 +40,6 @@ angular.module('myApp.results', []).controller('ResultsController', ['Itinerary'
 				}
 
 				var startTimeMin = leg.start_time.minute;
-				debugger;
 				leg.start_time.minute = ('0' + startTimeMin).slice(-2);
 			})
 		}
