@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-class TravellingTourist:
+class TravelingTourist:
     'The class containing the logic for retrieving the optimal intinery.'
 
     # mode = string representing mode
@@ -69,7 +69,7 @@ def main_page():
 @app.route('/example')
 def example_page():
     locations = ["1", "2", "3", "4", "5"]
-    tourist = TravellingTourist("walking", "", "", "", locations)
+    tourist = TravelingTourist("walking", "", "", "", locations)
     weights = tourist.get_weights()
     weights_string = ",".join(weights)
     tourist.request_shortest_path(5, weights_string)
