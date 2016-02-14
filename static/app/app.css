@@ -158,3 +158,12 @@ button.submit {
 #nav{
   overflow: scroll;
 }
+.form-group {
+  margin-left: 15px;
+}
+
+.form-group.duration {
+  width: 50px;
+  margin: 0;
+  display: inline-block;
+}
