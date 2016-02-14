@@ -9,27 +9,27 @@ app = Flask(__name__)
 class TravelingTourist:
     'The class containing the logic for retrieving the optimal intinery.'
 
-    # mode = string representing mode
-    #       ["driving", "walking", "bicycling", "transit"]
-    mode = "driving"
-    # transit_mode = string representing mode of transit, only if mode = transit
-    #       ["bus", "subway", "train", "tram", "rail"]
-    transit_mode = ""
-    # transit_preferences = string representing preferences
-    #       ["less_walking", "fewer_transfers"]
-    transit_preferences = "less_walking"
-    # avoid = string representing things to avoid
-    #       ["tolls", "highways", "ferries", "indoor"]
-    avoid = ""
-    # locations = array of string addresses
-    locations = []
-
     def __init__(self, mode, transit_mode, transit_preferences, avoid, locations):
+        # mode = string representing mode
+        #       ["driving", "walking", "bicycling", "transit"]
         self.mode = mode
+        # transit_mode = string representing mode of transit, only if mode = transit
+        #       ["bus", "subway", "train", "tram", "rail"]
         self.transit_mode = transit_mode
+        # transit_preferences = string representing preferences
+        #       ["less_walking", "fewer_transfers"]
         self.transit_preferences = transit_preferences
+        # avoid = string representing things to avoid
+        #       ["tolls", "highways", "ferries", "indoor"]
         self.avoid = avoid
+        # locations = array of string addresses
         self.locations = locations
+        # loc_to_duration = mapping of travel duration between two locations
+        self.loc_to_duration = {}
+        # the shortest duration for the entire trip
+        self.shortest_duration = 0
+        # the sequence of locations to visit
+        self.travel_sequence = []
 
 
     # Returns:  a list of ints representing the weights (ex. for 1, 2, 3, 4, 5, 
@@ -38,7 +38,10 @@ class TravelingTourist:
         weights = []
         for i in range(0, len(self.locations) - 1):
             for j in range(i+1, len(self.locations)):
-                weights.append(str(self.calculate_weight(self.locations[i], self.locations[j])))
+                duration = self.calculate_weight(self.locations[i], self.locations[j])
+                weights.append(str(duration))
+                self.loc_to_duration[(self.locations[i], self.locations[j])] = duration
+        print self.loc_to_duration
         return weights
 
     # Returns: the list of int weights as a comma-delimited string.
@@ -75,8 +78,31 @@ class TravelingTourist:
         comma_delim_locations = comma_delim_locations[:-1]
 
         params = {'locations': comma_delim_locations, 'weights': weights}
-        result = requests.get(wolfram_url, params=params)
-        return result.json()
+        result = requests.get(wolfram_url, params=params).json()
+        self.shortest_duration = result[0]
+
+        return result
+
+    def get_travel_sequence(self, sequence):
+        for i in range(0, len(sequence) - 1):
+            self.travel_sequence.append(self.locations[sequence[i] - 1])
+        return self.travel_sequence
+
+    # Return an array of travel times from one place in the travel_sequence to the next, in order.
+    def get_travel_duration(self):
+        travel_duration = []
+        for i in range(0, len(self.travel_sequence) - 1):
+            loc_a = self.travel_sequence[i]
+            loc_b = self.travel_sequence[i+1]
+            if (loc_a, loc_b) in self.loc_to_duration:
+                travel_duration.append(self.loc_to_duration[(loc_a, loc_b)])
+            elif (loc_b, loc_a) in self.loc_to_duration:
+                travel_duration.append(self.loc_to_duration[(loc_b, loc_a)])
+            else:
+                raise Exception("Unable to find duration for"+loc_a+", "+loc_b)
+        print "travel duration is"
+        print travel_duration
+        return travel_duration
 
 
 class Time:
@@ -105,45 +131,45 @@ class Time:
 
 class Itinerary:
 
-    # dictionary mapping location to amount of time allocated at that location.
-    loc_to_duration = {}
-
-    current_time = ""
-
-    travel_sequence = ""
-
-    # an array of time going from place to place, in order
-    travel_duration = []
-
-    result = []
-
     class TravelLeg:
-        start_loc = ""
-        end_loc = ""
-        duration = 0
-        start_time = ""
-
-        def __init__(self, start_loc, end_loc, duration, start_time):
+        def __init__(self, start_loc, end_loc, duration, travel_duration, start_time):
             self.start_loc = start_loc
             self.end_loc = end_loc
+            # the time to spend at the location, in seconds
             self.duration = duration
+            # the time that the user will begin to travel to the current location
             self.start_time = start_time
+            # the travel duration needed to get to the current location in seconds
+            # the origin's travel_duration is 0
+            self.travel_duration = travel_duration
 
         def get_end_time(self):
-            return self.start_time + self.duration
+            print self.start_time.to_string()
+            self.start_time.add(self.travel_duration/60) 
+            self.start_time.add(self.duration/60)
+            return self.start_time
 
-    def __init__(self, loc_to_duration, current_time, sequence, time_duration):
+    def __init__(self, loc_to_duration, start_time, sequence, travel_duration):
+        # user input -> dictionary mapping location to amount of time allocated at that location.
         self.loc_to_duration = loc_to_duration
-        self.current_time = current_time
+        # the time the user specifies as the start of their adventures.
+        self.start_time = start_time
+        # the order in which the locations will be visited, as determined by algorithmn.
         self.travel_sequence = sequence
-        self.time_duration = time_duration
+        # an array of time going from place to place, in order
+        self.travel_duration = travel_duration
+        # an array of TravelLegs
+        self.result = []
 
     def create_itinerary(self):
-        time = self.current_time
-        for i in range(0, self.travel_sequence.length - 1):
-            leg = self.TravelLeg(self.travel_sequence[i], self.travel_sequence[i+1], self.travel_duration, time)
-            self.result.append(leg)
+        time = self.start_time
+        for i in range(0, len(self.travel_sequence) - 1): 
+            loc_from = self.travel_sequence[i]
+            loc_to = self.travel_sequence[i+1]
+            leg = self.TravelLeg(loc_from, loc_to, self.loc_to_duration[loc_from] ,self.travel_duration[i], time)
+            self.result.append(json.dumps(leg, default=lambda o: o.__dict__))
             time = leg.get_end_time()
+        return self.result
 
 
 @app.route('/')
@@ -152,11 +178,20 @@ def main_page():
 
 @app.route('/example')
 def example_page():
-    locations = ["San Francisco", "Stanford", "Palo Alto", "Redwood City", "San Mateo"]
+    location_to_duration = {"San Mateo": 1, "San Francisco": 2, "Stanford": 3, "Oakland": 1, 
+    "Redwood City": 2}
+    locations = ["San Mateo", "San Francisco", "Stanford", "Redwood City", "Oakland"]
     tourist = TravelingTourist("walking", "", "less_walking", "", locations)
     weights = tourist.get_weights()
     result = tourist.request_shortest_path(5, tourist.weights_as_string(weights))
-    return render_template('example.html', name=result)
+    travel_sequence = tourist.get_travel_sequence(result[1])
+    print travel_sequence
+
+    start_time = Time(9, 0)
+    travel_duration = tourist.get_travel_duration()
+    itinerary_instance = Itinerary(location_to_duration, start_time, travel_sequence, travel_duration)
+    itinerary = itinerary_instance.create_itinerary()
+    return render_template('example.html', name=itinerary)
 
 if __name__ == '__main__':
     app.run(debug=True)
